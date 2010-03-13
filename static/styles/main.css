@@ -55,6 +55,8 @@ a {
     background-color: #ffffff;
     border-right: 1px solid #dadada;
     -moz-border-radius-bottomleft: 6px;
+    -webkit-border-bottom-left-radius: 6px;
+    border-bottom-left-radius: 6px;
     }
 
 .sidebar {
