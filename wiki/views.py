@@ -1,35 +1,23 @@
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponse
-
-from wiki.models import Page
+from django.http import Http404
 
 import time
 import datetime
 import git
+import repo
 
-def get_file(tree, path):
-    for f in path.split('/'):
-        if type(tree.get(f)) == git.Tree:
-            tree = tree.get(f)
-        else:
-            return tree.get(f)
-    return None
+REPO = repo.get_repository()
 
 def view(request, path, revision=None):
+    revision = REPO.commit(revision or 'HEAD')
+    try:
+        sourcefile = repo.get_file_from_tree(revision.tree, path)
+    except git.NoSuchPathError:
+        raise Http404("Page '%s' not found." % path)
 
-    print path
-    print revision
+    content = ':author: none\n\n' + sourcefile.data
 
-    repo = git.Repo('/home/stein/Labs/GitWiki/repo')
-    if revision:
-        head = repo.commit(revision)
-    else:
-        head = repo.commit('HEAD')
-    tree = head.tree
-
-    content = ':author: none\n\n' + get_file(tree, path).data
-
-    history = git.Commit.find_all(repo, 'HEAD', path)[:5]
+    history = git.Commit.find_all(REPO, 'HEAD', path)[:5]
     for i in history: i.date = datetime.datetime.fromtimestamp(time.mktime(i.committed_date))
 
-    return render_to_response('wiki/view.html', {'content': content, 'path': path, 'history': history})
+    return render_to_response('view.html', {'content': content, 'path': path, 'history': history})
