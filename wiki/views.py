@@ -4,16 +4,12 @@ from django.template import Template, Context
 from django.templatetags.markup import restructuredtext
 from django.utils.safestring import mark_safe
 
-from wiki.models import Page, PageType
+from wiki.models import PageType
 
 import time
 import datetime
 import git
 import repo
-
-import re
-
-REGEXP = re.compile('^%%(?P<type>.*)')
 
 REPO = repo.get_repository()
 
@@ -26,21 +22,24 @@ def view(request, path, revision=None):
 
     content = sourcefile.data
 
-    first_line = content.split('\n')[0]
+    first_line = content[:content.find('\n')]
     if first_line.startswith('%%'):
-        m = REGEXP.match(first_line)
-        if m:
-            type = PageType.objects.get(id=m.group('type').strip())
-            content = '\n'.join(content.split('\n')[1:])
-            if type.markup == 'restructuredtext':
+        content_type = first_line[2:]
+        if content_type:
+            page_type = PageType.objects.get(id=content_type.strip())
+            content = content[content.find('\n')+1:]
+            if page_type.markup == 'restructuredtext':
                 content = restructuredtext(':author: none\n\n' + content)
-            elif type.markup == 'html':
+            elif page_type.markup == 'html':
                 content = mark_safe(content)
 
-            layout = type.layout
-            t = Template(layout)
+            layout = page_type.layout
+    else:
+        layout = """{{ content }}"""
+
+    template = Template(layout)
 
     history = git.Commit.find_all(REPO, 'HEAD', path)[:5]
     for i in history: i.date = datetime.datetime.fromtimestamp(time.mktime(i.committed_date))
 
-    return HttpResponse(t.render(Context({'content': content, 'path': path, 'history': history})))
+    return HttpResponse(template.render(Context({'content': content, 'path': path, 'history': history})))

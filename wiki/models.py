@@ -1,14 +1,5 @@
 from django.db import models
 
-class Page(models.Model):
-
-    path = models.CharField(max_length=500, primary_key=True)
-    hash = models.CharField(max_length=64)
-    author = models.CharField(max_length=100)
-    date = models.DateTimeField()
-    content = models.TextField()
-
-
 class PageType(models.Model):
 
     id = models.CharField(max_length=100, primary_key=True)
@@ -17,3 +8,6 @@ class PageType(models.Model):
                                 ('html', 'HTML')
                                 ))
     layout = models.TextField()
+
+    def __unicode__(self):
+        return "PageType '%s' (uses '%s' markup)" % (self.id, self.markup)
