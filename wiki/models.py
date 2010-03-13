@@ -5,7 +5,8 @@ class PageType(models.Model):
     id = models.CharField(max_length=100, primary_key=True)
     markup = models.CharField(max_length=100, choices=(
                                 ('restructuredtext', 'reStructuredText'),
-                                ('html', 'HTML')
+                                ('html', 'HTML'),
+                                ('template', 'Django Template')
                                 ))
     layout = models.TextField()
 

@@ -6,6 +6,8 @@ from django.utils.safestring import mark_safe
 
 from wiki.models import PageType
 
+from cream import register_template
+
 import time
 import datetime
 import git
@@ -27,17 +29,23 @@ def view(request, path, revision=None):
         content_type = first_line[2:]
         if content_type:
             page_type = PageType.objects.get(id=content_type.strip())
+
+            layout = page_type.layout
+            template = Template(layout, name='main_template')
+
             content = content[content.find('\n')+1:]
             if page_type.markup == 'restructuredtext':
                 content = restructuredtext(':author: none\n\n' + content)
             elif page_type.markup == 'html':
                 content = mark_safe(content)
+            elif page_type.markup == 'template':
+                register_template('main_template', layout)
+                template = Template('{% extends "main_template" %}\n' + content)
 
-            layout = page_type.layout
     else:
         layout = """{{ content }}"""
 
-    template = Template(layout)
+    
 
     history = git.Commit.find_all(REPO, 'HEAD', path)[:5]
     for i in history: i.date = datetime.datetime.fromtimestamp(time.mktime(i.committed_date))
