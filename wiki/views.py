@@ -1,11 +1,17 @@
-from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
+from django.template import Template, Context
+from django.templatetags.markup import restructuredtext
+from django.utils.safestring import mark_safe
 
-from wiki.models import Page
+from wiki.models import Page, PageType
 
 import time
 import datetime
 import git
+
+import re
+
+REGEXP = re.compile('^%%(?P<type>.*)')
 
 def get_file(tree, path):
     for f in path.split('/'):
@@ -17,9 +23,6 @@ def get_file(tree, path):
 
 def view(request, path, revision=None):
 
-    print path
-    print revision
-
     repo = git.Repo('/home/stein/Labs/GitWiki/repo')
     if revision:
         head = repo.commit(revision)
@@ -27,9 +30,23 @@ def view(request, path, revision=None):
         head = repo.commit('HEAD')
     tree = head.tree
 
-    content = ':author: none\n\n' + get_file(tree, path).data
+    content = get_file(tree, path).data
+
+    first_line = content.split('\n')[0]
+    if first_line.startswith('%%'):
+        m = REGEXP.match(first_line)
+        if m:
+            type = PageType.objects.get(id=m.group('type').strip())
+            content = '\n'.join(content.split('\n')[1:])
+            if type.markup == 'restructuredtext':
+                content = restructuredtext(':author: none\n\n' + content)
+            elif type.markup == 'html':
+                content = mark_safe(content)
+
+            layout = type.layout
+            t = Template(layout)
 
     history = git.Commit.find_all(repo, 'HEAD', path)[:5]
     for i in history: i.date = datetime.datetime.fromtimestamp(time.mktime(i.committed_date))
 
-    return render_to_response('wiki/view.html', {'content': content, 'path': path, 'history': history})
+    return HttpResponse(t.render(Context({'content': content, 'path': path, 'history': history})))

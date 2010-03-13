@@ -7,3 +7,13 @@ class Page(models.Model):
     author = models.CharField(max_length=100)
     date = models.DateTimeField()
     content = models.TextField()
+
+
+class PageType(models.Model):
+
+    id = models.CharField(max_length=100, primary_key=True)
+    markup = models.CharField(max_length=100, choices=(
+                                ('restructuredtext', 'reStructuredText'),
+                                ('html', 'HTML')
+                                ))
+    layout = models.TextField()
