@@ -4,9 +4,9 @@ from django.template import Template, Context
 from django.templatetags.markup import restructuredtext
 from django.utils.safestring import mark_safe
 
-from wiki.models import PageType
+from cms.models import PageType
 
-from cream import register_template
+from cms import register_template
 
 import time
 import datetime
