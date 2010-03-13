@@ -1,4 +1,5 @@
 from django.http import HttpResponseRedirect, HttpResponse
+from django.http import Http404
 from django.template import Template, Context
 from django.templatetags.markup import restructuredtext
 from django.utils.safestring import mark_safe
@@ -8,29 +9,22 @@ from wiki.models import Page, PageType
 import time
 import datetime
 import git
+import repo
 
 import re
 
 REGEXP = re.compile('^%%(?P<type>.*)')
 
-def get_file(tree, path):
-    for f in path.split('/'):
-        if type(tree.get(f)) == git.Tree:
-            tree = tree.get(f)
-        else:
-            return tree.get(f)
-    return None
+REPO = repo.get_repository()
 
 def view(request, path, revision=None):
+    revision = REPO.commit(revision or 'HEAD')
+    try:
+        sourcefile = repo.get_file_from_tree(revision.tree, path)
+    except git.NoSuchPathError:
+        raise Http404("Page '%s' not found." % path)
 
-    repo = git.Repo('/home/stein/Labs/GitWiki/repo')
-    if revision:
-        head = repo.commit(revision)
-    else:
-        head = repo.commit('HEAD')
-    tree = head.tree
-
-    content = get_file(tree, path).data
+    content = sourcefile.data
 
     first_line = content.split('\n')[0]
     if first_line.startswith('%%'):
@@ -46,7 +40,7 @@ def view(request, path, revision=None):
             layout = type.layout
             t = Template(layout)
 
-    history = git.Commit.find_all(repo, 'HEAD', path)[:5]
+    history = git.Commit.find_all(REPO, 'HEAD', path)[:5]
     for i in history: i.date = datetime.datetime.fromtimestamp(time.mktime(i.committed_date))
 
     return HttpResponse(t.render(Context({'content': content, 'path': path, 'history': history})))
