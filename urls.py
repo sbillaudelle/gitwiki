@@ -14,6 +14,6 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     # (r'^admin/', include(admin.site.urls)),
-    (r'^wiki/', include('cream.wiki.urls')),
+    (r'^wiki/', include('wiki.urls')),
     (r'^static/(?P<path>.*)', 'django.views.static.serve', {'document_root': 'static'}),
 )
