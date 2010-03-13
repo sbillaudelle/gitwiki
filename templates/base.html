@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        {% block head %}
+        <title>cream desktop » {% block title %}{%endblock%}</title>
+        <link href="/static/styles/main.css" rel="stylesheet" type="text/css">
+        {% block style %}
+        {% endblock %}
+        {%endblock%}
+    </head>
+    <body>
+        <div class="page">
+            <div class="header">
+                <div class="navigation">
+                </div>
+            </div>
+            <div class="content">
+                {% block content %}{% endblock %}
+            </div>
+            <div class="sidebar">
+                {% block sidebar %}{% endblock %}
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div class="end">
+        </div>
+{% block dialogs %}
+{% endblock %}
+
+    </body>
+</html>

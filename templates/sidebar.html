@@ -1,0 +1,20 @@
+<div>
+	{% if user.is_authenticated %}
+		<div style="float: left;">
+			<a href="/user/logout/">logout</a>
+		</div>
+		<div style="float: right">
+			<a href="/user/{{ user.username }}">profile</a>
+		</div>
+		<div style="clear: both; width: 100%; text-align: center;">
+            {% if user.profile.avatar %}
+            <img style="margin: 10px 0 10px 0; width: 100px; height: 100px;" src="{{ user.profile.avatar.url }}" /><br />
+            {% else %}
+            <img src="/images/user.png" /><br />
+            {% endif %}
+			{{ user.username }}
+		</div>
+	{%else%}
+		<a href="/user/login">» Login/Register</a>
+	{% endif %}
+</div>

@@ -1,0 +1,13 @@
+<div class="path">
+	<a href="/">cream-project.org</a>
+	{% for e in track %}
+        {% for i in e %}
+            {% if forloop.first %}
+                » <a href="{{ i }}">
+            {% endif %}
+            {% if forloop.last %}
+                {{ i|safe }}</a>
+            {% endif %}
+        {% endfor %}
+	{% endfor %}
+</div>
