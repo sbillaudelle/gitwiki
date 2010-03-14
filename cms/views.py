@@ -1,10 +1,9 @@
-from django.http import HttpResponseRedirect, HttpResponse
-from django.http import Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.template import Template, Context
 from django.templatetags.markup import restructuredtext
 from django.utils.safestring import mark_safe
 
-from cms.models import PageType
+from cms.models import PageType, Page, Redirection
 
 from cms import register_template
 
@@ -16,6 +15,13 @@ import repo
 REPO = repo.get_repository()
 
 def view(request, path, revision=None):
+
+    try:
+        redirection = Redirection.objects.get(url=request.path)
+        return HttpResponseRedirect(redirection.destination)
+    except:
+        pass
+
     revision = REPO.commit(revision or 'HEAD')
     try:
         sourcefile = repo.get_file_from_tree(revision.tree, path)
@@ -50,4 +56,6 @@ def view(request, path, revision=None):
     history = git.Commit.find_all(REPO, 'HEAD', path)[:5]
     for i in history: i.date = datetime.datetime.fromtimestamp(time.mktime(i.committed_date))
 
-    return HttpResponse(template.render(Context({'content': content, 'path': path, 'history': history})))
+    pages = Page.objects.all().filter(visible=True).order_by('position')
+
+    return HttpResponse(template.render(Context({'content': content, 'path': path, 'history': history, 'pages': pages})))

@@ -10,5 +10,28 @@ class PageType(models.Model):
                                 ))
     layout = models.TextField()
 
+
     def __unicode__(self):
-        return "PageType '%s' (uses '%s' markup)" % (self.id, self.markup)
+        return "PageType '{0}' (uses '{1}' markup)".format(self.id, self.markup)
+
+
+class Page(models.Model):
+
+    title = models.CharField(max_length=200)
+    destination = models.CharField(max_length=200)
+    visible = models.BooleanField()
+    position = models.IntegerField()
+
+
+    def __unicode__(self):
+        return "Page '{0}'".format(self.title)
+
+
+class Redirection(models.Model):
+
+    url = models.CharField(max_length=200, primary_key=True)
+    destination = models.CharField(max_length=200)
+
+
+    def __unicode__(self):
+        return "Redirection from '{0}' to '{1}'".format(self.url, self.destination)
