@@ -14,6 +14,10 @@ a {
     text-decoration: none;
     }
 
+a img {
+    border: 0;
+}
+
 .page {
     width: 1000px;
     margin: 0px auto 0px auto;
