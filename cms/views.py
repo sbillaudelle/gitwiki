@@ -51,11 +51,16 @@ def view(request, path, revision=None):
     else:
         layout = """{{ content }}"""
 
-    
 
     history = git.Commit.find_all(REPO, 'HEAD', path)[:5]
     for i in history: i.date = datetime.datetime.fromtimestamp(time.mktime(i.committed_date))
 
     pages = Page.objects.all().filter(visible=True).order_by('position')
 
-    return HttpResponse(template.render(Context({'content': content, 'path': path, 'history': history, 'pages': pages})))
+    return HttpResponse(template.render(Context({
+        'content': content,
+        'path': path,
+        'history': history,
+        'pages': pages,
+        'title' : path.strip('/')
+    })))
