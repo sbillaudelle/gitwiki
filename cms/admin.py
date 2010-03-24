@@ -1,4 +1,4 @@
-from cms.models import Page, PageType, Redirection
+from cream.cms.models import Page, PageType, Redirection
 from django.contrib import admin
 
 admin.site.register(Page)
