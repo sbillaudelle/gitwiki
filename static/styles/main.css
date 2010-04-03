@@ -79,7 +79,7 @@ a img {
     text-align: center;
     font-size: .9em;
     color: #888888;
-    }
+}
 
 #content {
     float: left;
@@ -93,14 +93,14 @@ a img {
     -moz-border-radius-bottomleft: 6px;
     -webkit-border-bottom-left-radius: 6px;
     border-bottom-left-radius: 6px;
-    }
+}
 
 .sidebar {
     margin-right: 5px;
     padding: 5px 5px 5px 0px;
     float: right;
     width: 225px;
-    }
+}
 
 #end {
     width: 1000px;
@@ -108,4 +108,24 @@ a img {
     margin: 0px auto 0px auto;
 
     background-image: url(/static/images/end.png);
-    }
+}
+
+#content h1 {
+   text-align: center;
+}
+
+/* Indent content. */
+#content .section {
+    padding-left: 15px;
+}
+
+/* In-indent headlines. */
+#content .section h2,
+#content .section h3,
+#content .section h4,
+#content .section h5,
+#content .section h6 {
+   background-color: white;
+   margin-left: -16px;
+   padding-bottom: 2px;
+}
