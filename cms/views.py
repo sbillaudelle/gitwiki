@@ -17,9 +17,8 @@ REPO = repo.get_repository()
 def view(request, path, revision=None):
 
     try:
-        redirection = Redirection.objects.get(url=request.path)
-        return HttpResponseRedirect(redirection.destination)
-    except:
+        return HttpResponseRedirect(Redirection.objects.get(url=request.path))
+    except Redirection.DoesNotExist:
         pass
 
     revision = REPO.commit(revision or 'HEAD')
@@ -49,7 +48,7 @@ def view(request, path, revision=None):
                 template = Template('{% extends "main_template" %}\n' + content)
 
     else:
-        layout = """{{ content }}"""
+        template = Template("""{{ content }}""")
 
 
     history = git.Commit.find_all(REPO, 'HEAD', path)[:5]
