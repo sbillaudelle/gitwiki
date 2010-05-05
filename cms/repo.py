@@ -6,7 +6,7 @@ def get_repository():
 
 def get_file_from_tree(tree, path):
     for part in path.split('/'):
-        tree = tree.get(part)
+        tree = tree[part]
         if tree is None:
             # File not found :(
             break
