@@ -29,9 +29,10 @@ def view(request, path, revision=None):
         raise Http404("Page '%s' not found." % path)
 
     content = sourcefile.data
+    mime_type = sourcefile.mime_type
 
     first_line = content[:content.find('\n')]
-    if first_line.startswith('%%'):
+    if mime_type == 'text/plain' and first_line.startswith('%%'):
         content_type = first_line[2:]
         if content_type:
             page_type = PageType.objects.get(id=content_type.strip())
@@ -47,14 +48,10 @@ def view(request, path, revision=None):
             elif page_type.markup == 'template':
                 register_template('main_template', layout)
                 template = Template('{% extends "main_template" %}\n' + content)
-
     else:
-        layout = """{{ content }}"""
+        return HttpResponse(content, mimetype=mime_type)
 
-    
-
-    history = git.Commit.find_all(REPO, 'HEAD', path)[:5]
-    for i in history: i.date = datetime.datetime.fromtimestamp(time.mktime(i.committed_date))
+    history = REPO.iter_commits('master', max_count=5)
 
     pages = Page.objects.all().filter(visible=True).order_by('position')
 
