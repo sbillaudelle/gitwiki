@@ -2,22 +2,22 @@
 <html>
     <head>
         {% block head %}
-        <title>cream desktop » {% block title %}{{ title }}{%endblock%}</title>
+        <title>cream desktop » {% block title %}{%endblock%}</title>
         <link href="/static/styles/main.css" rel="stylesheet" type="text/css">
         {% block style %}
         {% endblock %}
         {%endblock%}
     </head>
     <body>
-        <div id="page">
-            <div id="header">
-                <ul id="navigation">
+        <div class="page">
+            <div class="header">
+                <div class="navigation">
                     {% for page in pages %}
-                        <li><a href="{{ page.destination }}">{{ page.title }}</a></li>
+                        <a href="{{ page.destination }}">{{ page.title }}</a>
                     {% endfor %}
-                </ul>
+                </div>
             </div>
-            <div id="content">
+            <div class="content">
                 {% block content %}{% endblock %}
             </div>
             <div class="sidebar">
@@ -25,7 +25,8 @@
             </div>
             <div style="clear: both;"></div>
         </div>
-        <div id="end"></div>
+        <div class="end">
+        </div>
 {% block dialogs %}
 {% endblock %}
 
